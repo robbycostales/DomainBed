@@ -116,7 +116,12 @@ def download_pacs(data_dir):
     # Original URL: http://www.eecs.qmul.ac.uk/~dl307/project_iccv2017
     full_path = stage_path(data_dir, "PACS")
 
-    download_and_extract("https://drive.google.com/uc?id=1JFr8f805nMUelQWWmfnJR3y4_SYoN5Pd",
+    # This link is broken...
+    # download_and_extract("https://drive.google.com/uc?id=1JFr8f805nMUelQWWmfnJR3y4_SYoN5Pd",
+                         # os.path.join(data_dir, "PACS.zip"))
+
+    # Need to confirm no antivirus scan
+    download_and_extract("https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1JFr8f805nMUelQWWmfnJR3y4_SYoN5Pd",
                          os.path.join(data_dir, "PACS.zip"))
 
     os.rename(os.path.join(data_dir, "kfold"),
@@ -264,11 +269,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # download_mnist(args.data_dir)
-    # download_pacs(args.data_dir)
+    download_pacs(args.data_dir)
     # download_office_home(args.data_dir)
     # download_domain_net(args.data_dir)
     # download_vlcs(args.data_dir)
-    download_terra_incognita(args.data_dir)
+    # download_terra_incognita(args.data_dir)
     # download_sviro(args.data_dir)
     # Camelyon17Dataset(root_dir=args.data_dir, download=True)
     # FMoWDataset(root_dir=args.data_dir, download=True)

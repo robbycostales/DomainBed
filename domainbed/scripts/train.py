@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument('--test_envs', type=int, nargs='+', default=[0])
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
+    parser.add_argument('--adapt_lambda', type=float, default=1.0)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
         help="For domain adaptation, % of test to use unlabeled for training.")
     parser.add_argument('--skip_model_save', action='store_true')
@@ -79,6 +80,7 @@ if __name__ == "__main__":
             misc.seed_hash(args.hparams_seed, args.trial_seed))
     if args.hparams:
         hparams.update(json.loads(args.hparams))
+    hparams['adapt_lambda'] = args.adapt_lambda
 
     print('HParams:')
     for k, v in sorted(hparams.items()):
@@ -91,6 +93,8 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
 
     if torch.cuda.is_available():
+        # device_id = os.environ['CUDA_VISIBLE_DEVICES']
+        # device = f"cuda:{device_id}"
         device = "cuda"
     else:
         device = "cpu"
@@ -127,6 +131,7 @@ if __name__ == "__main__":
             uda, in_ = misc.split_dataset(in_,
                 int(len(in_)*args.uda_holdout_fraction),
                 misc.seed_hash(args.trial_seed, env_i))
+            # print("UDA", len(uda), "IN", len(in_))
 
         if hparams['class_balanced']:
             in_weights = misc.make_weights_for_balanced_classes(in_)
@@ -156,8 +161,10 @@ if __name__ == "__main__":
         weights=env_weights,
         batch_size=hparams['batch_size'],
         num_workers=dataset.N_WORKERS)
-        for i, (env, env_weights) in enumerate(uda_splits)
-        if i in args.test_envs]
+        for i, (env, env_weights) in enumerate(uda_splits)]
+        # if i in args.test_envs]   # This line makes absolutely no sense...
+                                    # `uda_splits` already only contains the
+                                    # relevant test_envs...
 
     eval_loaders = [FastDataLoader(
         dataset=env,
