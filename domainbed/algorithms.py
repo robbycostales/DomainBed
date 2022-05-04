@@ -643,7 +643,8 @@ class AbstractMMD(ERM):
         upenalty = 0
         penalty = 0
         nmb = len(minibatches)
-        unmb = len(unlabeled)
+        if unlabeled is not None:
+            unmb = len(unlabeled)
 
         features = [self.featurizer(xi) for xi, _ in minibatches]
         if unlabeled is not None:
@@ -673,7 +674,7 @@ class AbstractMMD(ERM):
         fullobj = objective
         fullobj += self.hparams['mmd_gamma'] * penalty
         if unlabeled is not None:
-            fullobj += 1.0 * upenalty
+            fullobj += self.hparams['adapt_lambda'] * upenalty
         fullobj.backward()
 
         self.optimizer.step()
@@ -681,7 +682,10 @@ class AbstractMMD(ERM):
         if torch.is_tensor(penalty):
             penalty = penalty.item()
 
-        return {'loss': objective.item(), 'penalty': penalty}
+        if torch.is_tensor(upenalty):
+            upenalty = upenalty.item()
+
+        return {'loss': objective.item(), 'penalty': penalty, 'upenalty': upenalty}
 
 
 class MMD(AbstractMMD):
