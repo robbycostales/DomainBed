@@ -1,3 +1,22 @@
+# Robby's Notes
+
+The main algorithmic change was adding domain _adaptation_ functionality to CORAL (via AbstractMMD) in `./domainbed/algorithms.py` ([here](https://github.com/robbycostales/DomainBed/blob/main/domainbed/algorithms.py#L641)). 
+
+To run CORAL with domain adaptation capabilities, use: 
+
+```
+CUDA_VISIBLE_DEVICES=0 python3 -m domainbed.scripts.train \
+    --data_dir=./domainbed/data/\
+    --hparams='{"resnet18": 1}'\
+    --output_dir=./output_pacs_coral_t3_adaptation\
+    --algorithm CORAL\
+    --dataset PACS\
+    --test_env 3\
+    --task domain_adaptation\
+    --uda_holdout_fraction 0.8\
+    --adapt_lambda 0.3
+```
+
 # Welcome to DomainBed
 
 DomainBed is a PyTorch suite containing benchmark datasets and algorithms for domain generalization, as introduced in [In Search of Lost Domain Generalization](https://arxiv.org/abs/2007.01434).
